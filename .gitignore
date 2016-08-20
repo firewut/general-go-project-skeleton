@@ -1,0 +1,8 @@
+bin/
+pkg/
+.DS_Store
+.vendor
+
+*.test
+*.pprof
+*.out
