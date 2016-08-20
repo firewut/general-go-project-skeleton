@@ -1,6 +1,6 @@
-# general-go-project-skeleton
+# general-go-project-template
 
-Skeleton of golang project which uses [Python Invoke](http://www.pyinvoke.org/) as replacement of Makefile
+Template of golang project which uses [Python Invoke](http://www.pyinvoke.org/) as replacement of Makefile
 
 ## Python requirements Installation
 
