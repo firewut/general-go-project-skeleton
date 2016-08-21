@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from invoke import run, task
+from invoke import task
 
 import multiprocessing
 import logging
@@ -42,41 +42,41 @@ modules = [
 ]
 
 @task
-def remove_deps():
-    run("rm -rf %(GOPATH)s" % global_vars, encoding="utf-8")
+def remove_deps(ctx):
+    ctx.run("rm -rf %(GOPATH)s" % global_vars, encoding="utf-8")
 
 @task
-def copy_src():
-    run("mkdir -p %(GOPATH)s" % global_vars, encoding="utf-8")
-    run("rm -rf %(GOPATH)s/src/project" % global_vars, encoding="utf-8")
-    run("rm -rf %(GOPATH)s/pkg/" % global_vars, encoding="utf-8")
-    run("cp -r %(CURDIR)s/src %(GOPATH)s" % global_vars, encoding="utf-8")
+def copy_src(ctx):
+    ctx.run("mkdir -p %(GOPATH)s" % global_vars, encoding="utf-8")
+    ctx.run("rm -rf %(GOPATH)s/src/project" % global_vars, encoding="utf-8")
+    ctx.run("rm -rf %(GOPATH)s/pkg/" % global_vars, encoding="utf-8")
+    ctx.run("cp -r %(CURDIR)s/src %(GOPATH)s" % global_vars, encoding="utf-8")
 
 @task(pre=[remove_deps, copy_src])
-def get(install=True):
+def get(ctx, install=True):
     if install:
         with open(global_vars["DEPENDENCIES"], 'r') as f:
             for line in f:
                 local_command = "env GOPATH=%(GOPATH)s" % global_vars
-                run("%s go get -v %s" % (local_command, line), encoding="utf-8")
+                ctx.run("%s go get -v %s" % (local_command, line), encoding="utf-8")
 
 
 @task(pre=[copy_src])
-def start_fast(race=False):
+def start_fast(ctx, race=False):
     local_command = "%(GOCOMMAND)s go run %(GOPATH)s/src/project/main.go" % global_vars
     if race:
         local_command += " -race "
-    run(local_command, encoding="utf-8")
+    ctx.run(local_command, encoding="utf-8")
 
 
 @task(pre=[get, copy_src])
-def start():
-    run("%(GOCOMMAND)s go run %(GOPATH)s/src/project/main.go" %
+def start(ctx):
+    ctx.run("%(GOCOMMAND)s go run %(GOPATH)s/src/project/main.go" %
         global_vars, encoding="utf-8")
 
 
 @task(pre=[copy_src])
-def test_fast(module="", race=False, cover=False, report=False, count=1, cpu=0):
+def test_fast(ctx, module="", race=False, cover=False, report=False, count=1, cpu=0):
     if cpu == 0:
         cpu = multiprocessing.cpu_count()
 
@@ -89,25 +89,25 @@ def test_fast(module="", race=False, cover=False, report=False, count=1, cpu=0):
                 "COVER_PROFILE_FILE"]
         local_command += " -count=%d -cpu=%d --parallel %d" % (count, cpu, cpu)
 
-        run("%s %s" % (local_command, module), encoding="utf-8")
+        ctx.run("%s %s" % (local_command, module), encoding="utf-8")
 
         if report:
-            run("%s go tool cover -html=%s" %
+            ctx.run("%s go tool cover -html=%s" %
                 (global_vars["GOCOMMAND"], global_vars["COVER_PROFILE_FILE"]), encoding="utf-8")
     else:
         log.error("module %s is not registered" % module)
 
 
 @task(pre=[copy_src])
-def vet():
+def vet(ctx):
     for module in modules:
         local_command = "%(GOCOMMAND)s go vet " % global_vars
         log.info("Checking %s" % module)
-        run("%s %s" % (local_command, module), encoding="utf-8")
+        ctx.run("%s %s" % (local_command, module), encoding="utf-8")
 
 
 @task(pre=[copy_src])
-def build():
-    run("env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPATH=%(GOPATH)s go build \
+def build(ctx):
+    ctx.run("env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPATH=%(GOPATH)s go build \
             -ldflags '-s' -a -installsuffix cgo -o ./bin/project %(GOPATH)s/src/project/main.go" % global_vars
     )
