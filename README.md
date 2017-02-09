@@ -17,7 +17,7 @@ This skeleton contains a file `dependencies.txt` which has dependencies separate
 To install packages:
 
 ```bash
-invoke get --install
+invoke -r dev-tools get --install
 ```
 
 ### Test
@@ -25,7 +25,7 @@ invoke get --install
 To test
 
 ```bash
-invoke test_fast --module=project --cpu=8
+invoke -r dev-tools test_fast --module=project --cpu=8
 ```
 
 ### Run
@@ -33,11 +33,11 @@ invoke test_fast --module=project --cpu=8
 To execute a project
 
 ```bash
-invoke start_fast
+invoke -r dev-tools start_fast
 ```
 
 ### Build binary
 
 ```bash
-invoke build
+invoke -r dev-tools build
 ```
