@@ -7,7 +7,7 @@ Template of golang project which uses [Python Invoke](http://www.pyinvoke.org/) 
 To install required python modules execute:
 
 ```bash
-pip install -r requirements.txt
+pip install -r dev-tools/requirements.txt
 ```
 
 ### Golang Packages
@@ -17,7 +17,7 @@ This skeleton contains a file `dependencies.txt` which has dependencies separate
 To install packages:
 
 ```bash
-invoke -r dev-tools get --install
+invoke -r dev-tools get 
 ```
 
 ### Test
@@ -25,7 +25,8 @@ invoke -r dev-tools get --install
 To test
 
 ```bash
-invoke -r dev-tools test_fast --module=project --cpu=8
+invoke -r dev-tools test
+invoke -r dev-tools test --module=project/modules/config
 ```
 
 ### Run
@@ -33,7 +34,7 @@ invoke -r dev-tools test_fast --module=project --cpu=8
 To execute a project
 
 ```bash
-invoke -r dev-tools start_fast
+invoke -r dev-tools run 
 ```
 
 ### Build binary
